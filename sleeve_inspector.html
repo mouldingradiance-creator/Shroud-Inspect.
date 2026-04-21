@@ -1,799 +1,1806 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0F172A">
-<title>Sleeve Inspector AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#0F172A;--surface:#1E293B;--surface2:#263347;--border:#334155;
-  --blue:#3B82F6;--blue2:#1D4ED8;--green:#22C55E;--green2:#15803D;
-  --red:#EF4444;--red2:#B91C1C;--amber:#F59E0B;
-  --text:#F1F5F9;--muted:#94A3B8;--lite:#1E293B;
-  --mono:'DM Mono',monospace;
-  --sans:'Space Grotesk',sans-serif;
-  --shadow:0 4px 24px rgba(0,0,0,.4);
-  --glow-blue:0 0 20px rgba(59,130,246,.3);
-  --glow-green:0 0 20px rgba(34,197,94,.3);
-  --glow-red:0 0 20px rgba(239,68,68,.4);
-}
-html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--text);overscroll-behavior:none}
-.app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;background:var(--bg)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0A0F1E">
+  <title>Sleeve Inspector AI — MLD Radiance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent
+    }
 
-/* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.topbar-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),#6366F1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:var(--glow-blue)}
-.topbar-info{flex:1;min-width:0}
-.topbar-title{font-size:14px;font-weight:700;letter-spacing:-.01em}
-.topbar-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topbar-btns{display:flex;gap:6px}
-.icon-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.icon-btn:active{transform:scale(.9);background:var(--border)}
+    :root {
+      --bg: #0A0F1E;
+      --surface: #111827;
+      --surface2: #1C2537;
+      --surface3: #243049;
+      --border: #2D3B55;
+      --blue: #3B82F6;
+      --blue2: #1D4ED8;
+      --blue3: #60A5FA;
+      --green: #22C55E;
+      --green2: #15803D;
+      --green3: #4ADE80;
+      --red: #EF4444;
+      --red2: #B91C1C;
+      --red3: #FCA5A5;
+      --amber: #F59E0B;
+      --amber2: #D97706;
+      --text: #F1F5F9;
+      --muted: #64748B;
+      --muted2: #94A3B8;
+      --mono: 'DM Mono', monospace;
+      --sans: 'Space Grotesk', sans-serif;
+      --radius: 14px;
+      --radius-sm: 9px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, .5);
+      --glow-blue: 0 0 24px rgba(59, 130, 246, .35);
+      --glow-green: 0 0 24px rgba(34, 197, 94, .35);
+      --glow-red: 0 0 28px rgba(239, 68, 68, .45);
+    }
 
-/* ── STATUS BAR ── */
-.statusbar{padding:7px 14px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:.02em;transition:background .25s,color .25s}
-.s-idle{background:var(--surface);color:var(--muted)}
-.s-watching{background:rgba(59,130,246,.1);color:#93C5FD}
-.s-scanning{background:rgba(245,158,11,.08);color:var(--amber);animation:pulse .6s infinite alternate}
-.s-ok{background:rgba(34,197,94,.1);color:var(--green);box-shadow:var(--glow-green)}
-.s-ng{background:rgba(239,68,68,.12);color:var(--red);animation:ngpulse .35s infinite alternate}
-@keyframes pulse{from{opacity:1}to{opacity:.5}}
-@keyframes ngpulse{from{background:rgba(239,68,68,.12)}to{background:rgba(239,68,68,.22)}}
-.sdot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
-.sdot.blink{animation:blink .7s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      overscroll-behavior: none
+    }
 
-/* ── CAMERA ── */
-.cam-outer{position:relative;flex-shrink:0;background:#000}
-.cam-box{position:relative;width:100%;aspect-ratio:4/3;background:#080C14;overflow:hidden}
-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.95}
-.cam-overlay{position:absolute;inset:0;pointer-events:none;z-index:4}
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--bg);
+      position: relative
+    }
 
-.corner{position:absolute;width:20px;height:20px;border-color:rgba(59,130,246,.7);border-style:solid}
-.corner.tl{top:12px;left:12px;border-width:2px 0 0 2px}
-.corner.tr{top:12px;right:12px;border-width:2px 2px 0 0}
-.corner.bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
-.corner.br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      z-index: 20
+    }
 
-.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);display:none;z-index:5;animation:scandown 1.8s ease-in-out infinite}
-@keyframes scandown{0%{top:6%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:94%;opacity:0}}
+    .topbar-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #2563EB, #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      flex-shrink: 0;
+      box-shadow: var(--glow-blue)
+    }
 
-.result-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(2px)}
-.result-overlay.show{display:flex}
-.res-ok-bg{background:rgba(21,128,61,.55)}
-.res-ng-bg{background:rgba(185,28,28,.62)}
-.res-icon{font-size:56px;animation:popIn .3s ease}
-@keyframes popIn{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-.res-label{color:#fff;font-size:28px;font-weight:700;text-shadow:0 2px 12px rgba(0,0,0,.6);margin-top:8px;letter-spacing:.05em}
-.res-sub{color:rgba(255,255,255,.8);font-size:13px;margin-top:5px;font-family:var(--mono)}
+    .topbar-info {
+      flex: 1;
+      min-width: 0
+    }
 
-.ai-chip{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,.8);color:var(--text);font-size:10px;font-weight:600;padding:4px 11px;border-radius:20px;z-index:6;white-space:nowrap;max-width:92%;text-align:center;border:1px solid var(--border);font-family:var(--mono)}
-.presence-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--red2);z-index:6;transition:background .3s}
-.presence-bar.present{background:var(--green2)}
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      background: linear-gradient(90deg, #60A5FA, #A78BFA);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
 
-/* ── SLEEVE STRIP ── */
-.sleeve-strip{display:flex;align-items:center;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);gap:10px;flex-shrink:0}
-.sleeve-strip-label{font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
-.sleeve-icons{display:flex;gap:8px;flex:1;justify-content:center}
-.sleeve-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);transition:all .35s;position:relative}
-.sleeve-dot.found{border-color:var(--green);background:rgba(34,197,94,.12);color:var(--green);box-shadow:0 0 10px rgba(34,197,94,.2)}
-.sleeve-dot.missing{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
-.sleeve-dot .tick{display:none}.sleeve-dot.found .tick{display:block}.sleeve-dot.found .num{display:none}
-.sleeve-count-big{font-size:24px;font-weight:700;color:var(--blue);min-width:44px;text-align:center;font-family:var(--mono)}
-.sleeve-req{font-size:10px;color:var(--muted);text-align:center;font-family:var(--mono)}
+    .topbar-sub {
+      font-size: 10px;
+      color: var(--muted2);
+      font-family: var(--mono);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
 
-/* ── METRICS ── */
-.metrics{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
-.mc{padding:8px 4px;text-align:center;border-right:1px solid var(--border)}
-.mc:last-child{border-right:none}
-.mc-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-family:var(--mono)}
-.mc-val{font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--mono)}
-.mc-val.g{color:var(--green)}.mc-val.r{color:var(--red)}.mc-val.b{color:var(--blue)}
+    .topbar-btns {
+      display: flex;
+      gap: 6px
+    }
 
-/* ── SCROLL ── */
-.scroll{flex:1;overflow-y:auto;padding:10px 12px 20px;display:flex;flex-direction:column;gap:9px}
-.scroll::-webkit-scrollbar{width:4px}
-.scroll::-webkit-scrollbar-track{background:transparent}
-.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .icon-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      position: relative
+    }
 
-/* ── CARD ── */
-.card{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden}
-.card-head{padding:8px 13px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--mono)}
+    .icon-btn:active {
+      transform: scale(.88)
+    }
 
-/* ── BUTTONS ── */
-.btn-grid{display:grid;gap:8px}
-.btn-grid.c2{grid-template-columns:1fr 1fr}
-.btn-grid.c3{grid-template-columns:1fr 1fr 1fr}
-.btn{padding:11px 8px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:5px;transition:transform .1s,filter .15s,box-shadow .15s;min-height:44px;letter-spacing:.02em;font-family:var(--sans)}
-.btn:active{transform:scale(.95)}
-.btn:disabled{opacity:.3;cursor:not-allowed}
-.btn-blue{background:var(--blue2);color:#fff;box-shadow:0 2px 12px rgba(29,78,216,.3)}
-.btn-green{background:var(--green2);color:#fff}
-.btn-red{background:var(--red2);color:#fff}
-.btn-amber{background:#92400E;color:#FDE68A}
-.btn-gray{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-watch{background:linear-gradient(135deg,#1D4ED8,#4F46E5);color:#fff;font-size:14px;font-weight:700;min-height:52px;box-shadow:var(--glow-blue)}
-.btn-watch.active{background:linear-gradient(135deg,var(--red2),#7F1D1D);box-shadow:var(--glow-red)}
+    .icon-btn.danger {
+      background: rgba(239, 68, 68, .12);
+      border-color: rgba(239, 68, 68, .25)
+    }
 
-/* ── SLIDERS ── */
-.slider-card{padding:11px 13px}
-.slider-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
-.slider-row:last-child{margin-bottom:0}
-.slider-row label{font-size:11px;color:var(--muted);min-width:100px;font-family:var(--mono)}
-.slider-row input[type=range]{flex:1;height:3px;-webkit-appearance:none;appearance:none;background:var(--surface2);border-radius:2px;border:1px solid var(--border);outline:none}
-.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--blue);cursor:pointer;box-shadow:var(--glow-blue)}
-.sval{font-size:12px;font-weight:700;color:var(--text);min-width:36px;text-align:right;font-family:var(--mono)}
+    /* ── STATUS PILL ── */
+    .status-pill {
+      margin: 10px 12px 0;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      letter-spacing: .04em;
+      transition: all .3s;
+      flex-shrink: 0
+    }
 
-/* ── FORM ── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:11px 13px}
-.fg label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono)}
-.fg select,.fg input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-weight:500;-webkit-appearance:none;font-family:var(--sans)}
-.fg select:focus,.fg input:focus{outline:none;border-color:var(--blue)}
+    .sp-idle {
+      background: rgba(100, 116, 139, .1);
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
 
-/* ── LOG ── */
-.log-body{max-height:140px;overflow-y:auto}
-.log-body::-webkit-scrollbar{width:3px}
-.log-body::-webkit-scrollbar-thumb{background:var(--border)}
-.log-row{display:flex;gap:7px;padding:5px 13px;border-bottom:1px solid var(--border);font-size:11px;align-items:baseline}
-.log-row:last-child{border:none}
-.lt{color:var(--muted);font-family:var(--mono);flex-shrink:0;font-size:10px}
-.lok{color:var(--green);font-weight:700}
-.lng{color:var(--red);font-weight:700}
-.lin{color:var(--blue)}
-.lwarn{color:var(--amber);font-weight:600}
+    .sp-cam {
+      background: rgba(59, 130, 246, .1);
+      color: #93C5FD;
+      border: 1px solid rgba(59, 130, 246, .25)
+    }
 
-/* ── AI FEED ── */
-.ai-feed{padding:10px 13px;font-size:12px;color:var(--muted);min-height:50px;line-height:1.7;font-family:var(--mono);white-space:pre-wrap}
+    .sp-scanning {
+      background: rgba(245, 158, 11, .08);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, .2);
+      animation: breathe .8s infinite alternate
+    }
 
-/* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.modal-bg.show{display:flex}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:20px 18px 34px;border:1px solid var(--border);border-bottom:none}
-.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.modal label{font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:5px;margin-top:12px;text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono)}
-.modal input,.modal select{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;font-weight:500;outline:none;font-family:var(--sans)}
-.modal input:focus,.modal select:focus{border-color:var(--blue)}
-.modal-btns{display:flex;gap:9px;margin-top:18px}
-.model-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
-.chip{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .15s;font-family:var(--mono)}
-.chip.active{border-color:var(--blue);background:rgba(59,130,246,.1);color:var(--blue)}
-.api-status{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:8px;font-weight:600;font-family:var(--mono)}
-.api-ok{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
-.api-bad{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
-.api-none{background:rgba(245,158,11,.08);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
-.info-box{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:10px 12px;margin-top:12px;font-size:12px;color:#93C5FD;line-height:1.6;font-family:var(--mono)}
+    .sp-ok {
+      background: rgba(34, 197, 94, .1);
+      color: var(--green3);
+      border: 1px solid rgba(34, 197, 94, .25);
+      box-shadow: var(--glow-green)
+    }
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--text);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:200;display:none;white-space:nowrap;box-shadow:var(--shadow);border:1px solid var(--border)}
+    .sp-ng {
+      background: rgba(239, 68, 68, .12);
+      color: var(--red3);
+      border: 1px solid rgba(239, 68, 68, .3);
+      animation: ngbreathe .4s infinite alternate
+    }
 
-/* ── CSV EXPORT NOTE ── */
-.no-server-note{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:8px 11px;font-size:11px;color:#86EFAC;font-family:var(--mono);line-height:1.5}
-</style>
+    @keyframes breathe {
+      from {
+        opacity: 1
+      }
+
+      to {
+        opacity: .5
+      }
+    }
+
+    @keyframes ngbreathe {
+      from {
+        background: rgba(239, 68, 68, .12)
+      }
+
+      to {
+        background: rgba(239, 68, 68, .25)
+      }
+    }
+
+    .sdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0
+    }
+
+    .sdot.blink {
+      animation: blink .7s infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .05
+      }
+    }
+
+    /* ── CAMERA ── */
+    .cam-wrap {
+      position: relative;
+      flex-shrink: 0;
+      margin: 10px 12px 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--border)
+    }
+
+    .cam-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #060A13;
+      overflow: hidden
+    }
+
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .cam-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4
+    }
+
+    .corner {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: rgba(96, 165, 250, .8);
+      border-style: solid
+    }
+
+    .corner.tl {
+      top: 10px;
+      left: 10px;
+      border-width: 2.5px 0 0 2.5px;
+      border-radius: 4px 0 0 0
+    }
+
+    .corner.tr {
+      top: 10px;
+      right: 10px;
+      border-width: 2.5px 2.5px 0 0;
+      border-radius: 0 4px 0 0
+    }
+
+    .corner.bl {
+      bottom: 10px;
+      left: 10px;
+      border-width: 0 0 2.5px 2.5px;
+      border-radius: 0 0 0 4px
+    }
+
+    .corner.br {
+      bottom: 10px;
+      right: 10px;
+      border-width: 0 2.5px 2.5px 0;
+      border-radius: 0 0 4px 0
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      display: none;
+      z-index: 5;
+      animation: scandown 2s ease-in-out infinite
+    }
+
+    @keyframes scandown {
+      0% {
+        top: 4%;
+        opacity: 0
+      }
+
+      8% {
+        opacity: 1
+      }
+
+      92% {
+        opacity: 1
+      }
+
+      100% {
+        top: 96%;
+        opacity: 0
+      }
+    }
+
+    .result-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(3px)
+    }
+
+    .result-overlay.show {
+      display: flex
+    }
+
+    .res-ok-bg {
+      background: rgba(21, 128, 61, .6)
+    }
+
+    .res-ng-bg {
+      background: rgba(185, 28, 28, .65)
+    }
+
+    .res-icon {
+      font-size: 62px;
+      animation: popIn .3s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(.2);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .res-label {
+      color: #fff;
+      font-size: 30px;
+      font-weight: 800;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, .7);
+      margin-top: 8px;
+      letter-spacing: .06em
+    }
+
+    .res-sub {
+      color: rgba(255, 255, 255, .85);
+      font-size: 13px;
+      margin-top: 6px;
+      font-family: var(--mono)
+    }
+
+    .cam-chip {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 15, 30, .85);
+      color: var(--text);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 13px;
+      border-radius: 20px;
+      z-index: 6;
+      white-space: nowrap;
+      max-width: 94%;
+      text-align: center;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      backdrop-filter: blur(8px)
+    }
+
+    .cam-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 3;
+      background: var(--surface);
+      cursor: pointer
+    }
+
+    .cam-placeholder .tap-icon {
+      font-size: 48px;
+      opacity: .6
+    }
+
+    .cam-placeholder .tap-label {
+      font-size: 13px;
+      color: var(--muted2);
+      font-family: var(--mono)
+    }
+
+    .cam-placeholder .tap-hint {
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(59, 130, 246, .1);
+      border: 1px solid rgba(59, 130, 246, .2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: #93C5FD
+    }
+
+    .presence-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--red2);
+      z-index: 6;
+      transition: background .3s
+    }
+
+    .presence-bar.present {
+      background: var(--green2)
+    }
+
+    /* ── SLEEVE STRIP ── */
+    .sleeve-strip {
+      display: flex;
+      align-items: center;
+      margin: 10px 12px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      gap: 12px;
+      flex-shrink: 0
+    }
+
+    .sleeve-strip-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-family: var(--mono)
+    }
+
+    .sleeve-icons {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      justify-content: center
+    }
+
+    .sleeve-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: all .4s;
+      position: relative
+    }
+
+    .sleeve-dot.found {
+      border-color: var(--green3);
+      background: rgba(34, 197, 94, .15);
+      color: var(--green3);
+      box-shadow: 0 0 12px rgba(34, 197, 94, .25), inset 0 0 8px rgba(34, 197, 94, .1)
+    }
+
+    .sleeve-dot.missing {
+      border-color: var(--red3);
+      background: rgba(239, 68, 68, .12);
+      color: var(--red3);
+      animation: missshake .4s ease
+    }
+
+    @keyframes missshake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-3px)
+      }
+
+      75% {
+        transform: translateX(3px)
+      }
+    }
+
+    .sleeve-dot .tick {
+      display: none
+    }
+
+    .sleeve-dot.found .tick {
+      display: block;
+      font-size: 16px
+    }
+
+    .sleeve-dot.found .num {
+      display: none
+    }
+
+    .sleeve-count-big {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--blue3);
+      min-width: 44px;
+      text-align: center;
+      font-family: var(--mono);
+      line-height: 1
+    }
+
+    .sleeve-req {
+      font-size: 9px;
+      color: var(--muted);
+      text-align: center;
+      font-family: var(--mono);
+      margin-top: 2px
+    }
+
+    /* ── METRICS ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      margin: 10px 12px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      flex-shrink: 0
+    }
+
+    .mc {
+      padding: 9px 4px;
+      text-align: center;
+      border-right: 1px solid var(--border)
+    }
+
+    .mc:last-child {
+      border-right: none
+    }
+
+    .mc-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 3px;
+      font-family: var(--mono)
+    }
+
+    .mc-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-family: var(--mono);
+      line-height: 1
+    }
+
+    .mc-val.g {
+      color: var(--green3)
+    }
+
+    .mc-val.r {
+      color: var(--red3)
+    }
+
+    .mc-val.b {
+      color: var(--blue3)
+    }
+
+    /* ── MAIN WATCH BTN ── */
+    .watch-btn-wrap {
+      margin: 10px 12px 0;
+      flex-shrink: 0
+    }
+
+    .btn-watch {
+      width: 100%;
+      padding: 16px 8px;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+      letter-spacing: .04em;
+      font-family: var(--sans);
+      min-height: 58px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .btn-watch::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .08), transparent);
+      pointer-events: none
+    }
+
+    .btn-watch.idle {
+      background: linear-gradient(135deg, #1D4ED8, #4F46E5);
+      color: #fff;
+      box-shadow: var(--glow-blue)
+    }
+
+    .btn-watch.cam-start {
+      background: linear-gradient(135deg, #1D4ED8, #4F46E5);
+      color: #fff;
+      box-shadow: var(--glow-blue)
+    }
+
+    .btn-watch.watching {
+      background: linear-gradient(135deg, var(--red2), #7F1D1D);
+      color: #fff;
+      box-shadow: var(--glow-red)
+    }
+
+    .btn-watch:active {
+      transform: scale(.97)
+    }
+
+    .btn-pulse {
+      animation: btnpulse 2s infinite
+    }
+
+    @keyframes btnpulse {
+
+      0%,
+      100% {
+        box-shadow: var(--glow-blue)
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(59, 130, 246, .6)
+      }
+    }
+
+    /* ── SCROLL SECTION ── */
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px
+    }
+
+    .scroll::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .scroll::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    .scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden
+    }
+
+    .card-head {
+      padding: 8px 14px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .card-head-icon {
+      font-size: 13px
+    }
+
+    /* ── CTRL BUTTONS ── */
+    .btn-grid {
+      display: grid;
+      gap: 8px;
+      padding: 10px
+    }
+
+    .btn-grid.c2 {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .btn-grid.c3 {
+      grid-template-columns: 1fr 1fr 1fr
+    }
+
+    .btn {
+      padding: 11px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform .1s, filter .15s;
+      min-height: 44px;
+      letter-spacing: .03em;
+      font-family: var(--sans)
+    }
+
+    .btn:active {
+      transform: scale(.93)
+    }
+
+    .btn-blue {
+      background: var(--blue2);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(29, 78, 216, .25)
+    }
+
+    .btn-red {
+      background: var(--red2);
+      color: #fff
+    }
+
+    .btn-amber {
+      background: #78350F;
+      color: #FDE68A
+    }
+
+    .btn-gray {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .btn-green {
+      background: var(--green2);
+      color: #fff
+    }
+
+    /* ── SLIDERS ── */
+    .slider-section {
+      padding: 11px 14px
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 0
+    }
+
+    .slider-row label {
+      font-size: 11px;
+      color: var(--muted2);
+      min-width: 90px;
+      font-family: var(--mono)
+    }
+
+    .slider-row input[type=range] {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--surface2);
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      outline: none
+    }
+
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      cursor: pointer;
+      box-shadow: var(--glow-blue);
+      border: 2px solid var(--surface)
+    }
+
+    .sval {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 38px;
+      text-align: right;
+      font-family: var(--mono)
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 11px 14px
+    }
+
+    .fg label {
+      font-size: 9px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-family: var(--mono)
+    }
+
+    .fg select,
+    .fg input {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      -webkit-appearance: none;
+      font-family: var(--sans);
+      outline: none
+    }
+
+    .fg select:focus,
+    .fg input:focus {
+      border-color: var(--blue)
+    }
+
+    /* ── AI FEED ── */
+    .ai-feed {
+      padding: 11px 14px;
+      font-size: 12px;
+      color: var(--muted2);
+      min-height: 56px;
+      line-height: 1.75;
+      font-family: var(--mono);
+      white-space: pre-wrap
+    }
+
+    /* ── LOG ── */
+    .log-body {
+      max-height: 150px;
+      overflow-y: auto
+    }
+
+    .log-body::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .log-body::-webkit-scrollbar-thumb {
+      background: var(--border)
+    }
+
+    .log-row {
+      display: flex;
+      gap: 7px;
+      padding: 6px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      align-items: baseline
+    }
+
+    .log-row:last-child {
+      border: none
+    }
+
+    .lt {
+      color: var(--muted);
+      font-family: var(--mono);
+      flex-shrink: 0;
+      font-size: 10px
+    }
+
+    .lok {
+      color: var(--green3);
+      font-weight: 700
+    }
+
+    .lng {
+      color: var(--red3);
+      font-weight: 700
+    }
+
+    .lin {
+      color: var(--blue3)
+    }
+
+    .lwarn {
+      color: var(--amber);
+      font-weight: 600
+    }
+
+    /* ── MODAL ── */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(6px)
+    }
+
+    .modal-bg.show {
+      display: flex
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 22px 22px 0 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 22px 18px 36px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      box-shadow: var(--shadow)
+    }
+
+    .modal-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin: 0 auto 18px
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 9px
+    }
+
+    .modal label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 5px;
+      margin-top: 14px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-family: var(--mono)
+    }
+
+    .modal input,
+    .modal select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      font-family: var(--sans)
+    }
+
+    .modal input:focus,
+    .modal select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .1)
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px
+    }
+
+    .model-chips {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    .chip {
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      transition: all .15s;
+      font-family: var(--mono)
+    }
+
+    .chip.active {
+      border-color: var(--blue);
+      background: rgba(59, 130, 246, .12);
+      color: var(--blue3)
+    }
+
+    .api-status {
+      font-size: 12px;
+      padding: 9px 13px;
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+      font-weight: 700;
+      font-family: var(--mono)
+    }
+
+    .api-ok {
+      background: rgba(34, 197, 94, .1);
+      color: var(--green3);
+      border: 1px solid rgba(34, 197, 94, .25)
+    }
+
+    .api-bad {
+      background: rgba(239, 68, 68, .1);
+      color: var(--red3);
+      border: 1px solid rgba(239, 68, 68, .25)
+    }
+
+    .api-none {
+      background: rgba(245, 158, 11, .08);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, .2)
+    }
+
+    .info-box {
+      background: rgba(59, 130, 246, .07);
+      border: 1px solid rgba(59, 130, 246, .18);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      margin-top: 13px;
+      font-size: 12px;
+      color: #93C5FD;
+      line-height: 1.65;
+      font-family: var(--mono)
+    }
+
+    /* ── PERMISSION BANNER ── */
+    .perm-banner {
+      display: none;
+      margin: 6px 12px 0;
+      padding: 10px 14px;
+      background: rgba(245, 158, 11, .08);
+      border: 1px solid rgba(245, 158, 11, .25);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--amber);
+      font-family: var(--mono);
+      line-height: 1.6;
+      flex-shrink: 0
+    }
+
+    .perm-banner.show {
+      display: block
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface2);
+      color: var(--text);
+      padding: 11px 22px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 200;
+      display: none;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border)
+    }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      background: rgba(34, 197, 94, .05);
+      border: 1px solid rgba(34, 197, 94, .12);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 11px;
+      color: #86EFAC;
+      font-family: var(--mono);
+      line-height: 1.55
+    }
+  </style>
 </head>
+
 <body>
-<div class="app">
+  <div class="app">
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-logo">👁</div>
-  <div class="topbar-info">
-    <div class="topbar-title">Sleeve Inspector AI</div>
-    <div class="topbar-sub" id="apiStatus">No API key — tap ⚙️ to set</div>
-  </div>
-  <div class="topbar-btns">
-    <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
-    <button class="icon-btn" onclick="exportCSV()" title="Export CSV">📥</button>
-  </div>
-</div>
-
-<!-- STATUS BAR -->
-<div class="statusbar s-idle" id="statusBar">
-  <div class="sdot" id="sdot"></div>
-  <span id="statusTxt">Set API key → Start Camera → WATCH</span>
-</div>
-
-<!-- CAMERA -->
-<div class="cam-outer">
-  <div class="cam-box" id="camBox">
-    <video id="video" autoplay playsinline muted></video>
-    <div class="cam-overlay">
-      <div class="corner tl"></div><div class="corner tr"></div>
-      <div class="corner bl"></div><div class="corner br"></div>
-    </div>
-    <div class="ai-chip" id="aiChip">Camera not started</div>
-    <div class="scan-line" id="scanLine"></div>
-    <div class="result-overlay res-ok-bg" id="resOK">
-      <div class="res-icon">✅</div>
-      <div class="res-label">ALL OK</div>
-      <div class="res-sub" id="resOKSub">3 / 3 sleeves detected</div>
-    </div>
-    <div class="result-overlay res-ng-bg" id="resNG">
-      <div class="res-icon">🚨</div>
-      <div class="res-label">SLEEVE MISSING!</div>
-      <div class="res-sub" id="resNGSub">Only 0 / 3 found</div>
-    </div>
-    <div class="presence-bar" id="presenceBar"></div>
-  </div>
-</div>
-
-<!-- SLEEVE STATUS -->
-<div class="sleeve-strip">
-  <div class="sleeve-strip-label">Sleeves</div>
-  <div class="sleeve-icons" id="sleeveIcons"></div>
-  <div style="text-align:center">
-    <div class="sleeve-count-big" id="sleeveCount">—</div>
-    <div class="sleeve-req">of <span id="reqNum">3</span> req.</div>
-  </div>
-</div>
-
-<!-- METRICS -->
-<div class="metrics">
-  <div class="mc"><div class="mc-label">Parts</div><div class="mc-val b" id="mTotal">0</div></div>
-  <div class="mc"><div class="mc-label">OK</div><div class="mc-val g" id="mOK">0</div></div>
-  <div class="mc"><div class="mc-label">NG</div><div class="mc-val r" id="mNG">0</div></div>
-  <div class="mc"><div class="mc-label">Pass%</div><div class="mc-val" id="mPass">—</div></div>
-</div>
-
-<!-- SCROLLABLE CONTROLS -->
-<div class="scroll">
-
-  <button class="btn btn-watch" id="btnWatch" onclick="toggleWatch()" disabled>
-    👁 START WATCHING
-  </button>
-
-  <div class="card">
-    <div class="card-head">Camera &amp; Controls</div>
-    <div style="padding:10px 13px">
-      <div class="btn-grid c2" style="margin-bottom:8px">
-        <button class="btn btn-blue" id="btnCam" onclick="startCam()">▶ Start Camera</button>
-        <button class="btn btn-red" id="btnBuzz" onclick="testAlarm()" disabled>🔔 Test Alarm</button>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-logo">👁</div>
+      <div class="topbar-info">
+        <div class="topbar-title">Sleeve Inspector AI</div>
+        <div class="topbar-sub" id="apiStatus">Tap ⚙️ to set your Gemini API key</div>
       </div>
-      <div class="btn-grid c3">
-        <button class="btn btn-gray" onclick="exportCSV()">📥 CSV Log</button>
-        <button class="btn btn-gray" onclick="resetLog()">📋 Clear Log</button>
-        <button class="btn btn-gray" onclick="resetSession()">↺ Reset</button>
+      <div class="topbar-btns">
+        <button class="icon-btn" onclick="openSettings()" title="Settings" id="settingsBtn">⚙️</button>
+        <button class="icon-btn" onclick="exportCSV()" title="Export CSV">📥</button>
       </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-head">Detection Settings</div>
-    <div class="slider-card">
-      <div class="slider-row">
-        <label>Sleeves req.</label>
-        <input type="range" id="reqSlider" min="1" max="4" value="3" step="1" oninput="onReq(this)">
-        <span class="sval" id="reqVal">3</span>
+    <!-- PERMISSION BANNER -->
+    <div class="perm-banner" id="permBanner">
+      ⚠️ Camera permission needed.<br>
+      Tap <b>START WATCHING</b> to allow camera access.
+    </div>
+
+    <!-- STATUS PILL -->
+    <div class="status-pill sp-idle" id="statusBar">
+      <div class="sdot" id="sdot"></div>
+      <span id="statusTxt">Tap START WATCHING to begin</span>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="cam-wrap">
+      <div class="cam-box" id="camBox">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="cam-overlay">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+        </div>
+        <!-- Placeholder shown before camera starts -->
+        <div class="cam-placeholder" id="camPlaceholder" onclick="initCamera()">
+          <div class="tap-icon">📷</div>
+          <div class="tap-label">Camera not started</div>
+          <div class="tap-hint">Tap here or START WATCHING below</div>
+        </div>
+        <div class="cam-chip" id="aiChip" style="display:none">Ready</div>
+        <div class="scan-line" id="scanLine"></div>
+        <div class="result-overlay res-ok-bg" id="resOK">
+          <div class="res-icon">✅</div>
+          <div class="res-label">ALL OK</div>
+          <div class="res-sub" id="resOKSub">3 / 3 sleeves ✓</div>
+        </div>
+        <div class="result-overlay res-ng-bg" id="resNG">
+          <div class="res-icon">🚨</div>
+          <div class="res-label">SLEEVE MISSING!</div>
+          <div class="res-sub" id="resNGSub">Only 0 / 3 found</div>
+        </div>
+        <div class="presence-bar" id="presenceBar"></div>
       </div>
-      <div class="slider-row">
-        <label>Scan every</label>
-        <input type="range" id="intSlider" min="2" max="15" value="4" step="1" oninput="onInt(this)">
-        <span class="sval" id="intVal">4s</span>
+    </div>
+
+    <!-- SLEEVE STATUS -->
+    <div class="sleeve-strip">
+      <div class="sleeve-strip-label">Sleeves</div>
+      <div class="sleeve-icons" id="sleeveIcons"></div>
+      <div style="text-align:center">
+        <div class="sleeve-count-big" id="sleeveCount">—</div>
+        <div class="sleeve-req">of <span id="reqNum">3</span> req.</div>
       </div>
-      <div class="slider-row">
-        <label>Alarm vol.</label>
-        <input type="range" id="volSlider" min="0.2" max="1.0" value="1.0" step="0.05" oninput="onVol(this)">
-        <span class="sval" id="volVal">MAX</span>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="mc">
+        <div class="mc-label">Parts</div>
+        <div class="mc-val b" id="mTotal">0</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">OK</div>
+        <div class="mc-val g" id="mOK">0</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">NG</div>
+        <div class="mc-val r" id="mNG">0</div>
+      </div>
+      <div class="mc">
+        <div class="mc-label">Pass%</div>
+        <div class="mc-val" id="mPass">—</div>
+      </div>
+    </div>
+
+    <!-- MAIN WATCH BUTTON -->
+    <div class="watch-btn-wrap">
+      <button class="btn-watch idle btn-pulse" id="btnWatch" onclick="handleWatchBtn()">
+        <span id="watchIcon">👁</span>
+        <span id="watchLabel">START WATCHING</span>
+      </button>
+    </div>
+
+    <!-- SCROLLABLE AREA -->
+    <div class="scroll">
+
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🎛</span> Quick Controls</div>
+        <div class="btn-grid c3">
+          <button class="btn btn-amber" onclick="testAlarm()">🔔 Alarm</button>
+          <button class="btn btn-gray" onclick="exportCSV()">📥 CSV</button>
+          <button class="btn btn-gray" onclick="resetSession()">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">⚙️</span> Detection Settings</div>
+        <div class="slider-section">
+          <div class="slider-row">
+            <label>Sleeves req.</label>
+            <input type="range" id="reqSlider" min="1" max="4" value="3" step="1" oninput="onReq(this)">
+            <span class="sval" id="reqVal">3</span>
+          </div>
+          <div class="slider-row">
+            <label>Scan every</label>
+            <input type="range" id="intSlider" min="2" max="15" value="4" step="1" oninput="onInt(this)">
+            <span class="sval" id="intVal">4s</span>
+          </div>
+          <div class="slider-row">
+            <label>Alarm vol.</label>
+            <input type="range" id="volSlider" min="0.2" max="1.0" value="1.0" step="0.05" oninput="onVol(this)">
+            <span class="sval" id="volVal">MAX</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">👤</span> Session Info</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Shift</label>
+            <select id="shiftSel">
+              <option>Day</option>
+              <option>Night</option>
+              <option>General</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Operator</label>
+            <input type="text" id="opInput" value="Operator 1" placeholder="Your name">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🤖</span> AI Analysis Feed</div>
+        <div class="ai-feed" id="aiFeed">AI analysis will appear here when watching…</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">📋</span> Inspection Log</div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+
+      <div class="footer-note">
+        ℹ️ Standalone mode — no server needed.<br>
+        Logs export as CSV. API key stored in browser only.
+      </div>
+    </div><!-- end scroll -->
+  </div><!-- end app -->
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-bg" id="modalBg" onclick="closeModalOnBg(event)">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">⚙️ API Settings</div>
+      <label>Google Gemini API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key here">
+      <div id="apiKeyStatus" class="api-status api-none">No key saved</div>
+      <label>Model</label>
+      <div class="model-chips" id="modelChips">
+        <div class="chip active" onclick="pickModel('gemini-2.0-flash',this)">2.0 Flash ⚡ Free</div>
+        <div class="chip" onclick="pickModel('gemini-1.5-flash',this)">1.5 Flash 🆓</div>
+        <div class="chip" onclick="pickModel('gemini-1.5-pro',this)">1.5 Pro 💎</div>
+      </div>
+      <div class="info-box">
+        🆓 Gemini 2.0 Flash — 1,500 req/day FREE<br>
+        Get key: <b>aistudio.google.com</b> → Get API Key
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-gray" style="flex:1;border-radius:var(--radius-sm)"
+          onclick="closeModal()">Cancel</button>
+        <button class="btn btn-blue" style="flex:2;border-radius:var(--radius-sm)" onclick="saveSettings()">💾 Save &
+          Close</button>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-head">Session Info</div>
-    <div class="form-grid">
-      <div class="fg">
-        <label>Shift</label>
-        <select id="shiftSel"><option>Day</option><option>Night</option><option>General</option></select>
-      </div>
-      <div class="fg">
-        <label>Operator</label>
-        <input type="text" id="opInput" value="Operator 1" placeholder="Your name">
-      </div>
-    </div>
-  </div>
+  <div class="toast" id="toast"></div>
 
-  <div class="card">
-    <div class="card-head">AI Analysis Feed</div>
-    <div class="ai-feed" id="aiFeed">AI analysis will appear here when watching…</div>
-  </div>
+  <script>
+    // ═══════════════════════════════════════════════
+    //  STATE
+    // ═══════════════════════════════════════════════
+    let stream = null, watching = false, watchTimer = null;
+    let cameraReady = false;
+    let audioCtx = null, buzzVol = 1.0;
+    let currentModel = 'gemini-2.0-flash';
+    let apiKey = '';
+    let partWasPresent = false, maxSleevesSeenThisCycle = 0, lastNotes = '';
+    let totalParts = 0, okParts = 0, ngParts = 0;
+    let reqSleeves = 3;
+    let alarmInterval = null;
+    const inspectionLog = [];
 
-  <div class="card">
-    <div class="card-head">Inspection Log</div>
-    <div class="log-body" id="logBody"></div>
-  </div>
-
-  <div class="no-server-note">
-    ℹ️ Standalone mode — no server needed.<br>
-    Log exports as CSV. API key stored in browser only.
-  </div>
-
-  <div style="height:8px"></div>
-</div><!-- end scroll -->
-</div><!-- end app -->
-
-<!-- SETTINGS MODAL -->
-<div class="modal-bg" id="modalBg" onclick="closeModalOnBg(event)">
-  <div class="modal">
-    <div class="modal-title">⚙️ API Settings</div>
-    <label>Google Gemini API Key</label>
-    <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key here">
-    <div id="apiKeyStatus" class="api-status api-none">No key saved</div>
-    <label>Model</label>
-    <div class="model-chips" id="modelChips">
-      <div class="chip active" onclick="pickModel('gemini-2.0-flash',this)">2.0 Flash ⚡ Free</div>
-      <div class="chip" onclick="pickModel('gemini-1.5-flash',this)">1.5 Flash 🆓</div>
-      <div class="chip" onclick="pickModel('gemini-1.5-pro',this)">1.5 Pro 💎</div>
-    </div>
-    <div class="info-box">
-      🆓 Gemini 2.0 Flash — 1,500 req/day FREE<br>
-      Get key: <b>aistudio.google.com</b> → Get API Key
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-gray" style="flex:1" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-blue" style="flex:2" onclick="saveSettings()">💾 Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-// ═══════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════
-let stream = null, watching = false, watchTimer = null;
-let audioCtx = null, buzzVol = 1.0;
-let currentModel = 'gemini-2.0-flash';
-let apiKey = '';
-let partWasPresent = false, maxSleevesSeenThisCycle = 0, lastNotes = '';
-let totalParts = 0, okParts = 0, ngParts = 0;
-let reqSleeves = 3;
-let alarmInterval = null;
-
-// In-memory log for CSV export
-const inspectionLog = [];
-
-// ═══════════════════════════════════════════════
-//  STORAGE — save/load key from localStorage
-// ═══════════════════════════════════════════════
-function loadStorage() {
-  try {
-    apiKey = localStorage.getItem('sleeveApiKey') || '';
-    currentModel = localStorage.getItem('sleeveModel') || 'gemini-2.0-flash';
-    if (apiKey) {
-      document.getElementById('apiStatus').textContent = 'Model: '+currentModel+' · Key set ✓';
+    // ═══════════════════════════════════════════════
+    //  STORAGE
+    // ═══════════════════════════════════════════════
+    function loadStorage() {
+      try {
+        apiKey = localStorage.getItem('sleeveApiKey') || '';
+        currentModel = localStorage.getItem('sleeveModel') || 'gemini-2.0-flash';
+        if (apiKey) {
+          document.getElementById('apiStatus').textContent = 'Model: ' + currentModel + ' · Key ✓';
+          document.getElementById('settingsBtn').style.background = 'rgba(34,197,94,.1)';
+          document.getElementById('settingsBtn').style.borderColor = 'rgba(34,197,94,.3)';
+        }
+        updateChips(currentModel);
+      } catch (e) { }
     }
-    updateChips(currentModel);
-  } catch(e) {}
-}
-function saveStorage() {
-  try {
-    localStorage.setItem('sleeveApiKey', apiKey);
-    localStorage.setItem('sleeveModel', currentModel);
-  } catch(e) {}
-}
+    function saveStorage() {
+      try {
+        localStorage.setItem('sleeveApiKey', apiKey);
+        localStorage.setItem('sleeveModel', currentModel);
+      } catch (e) { }
+    }
 
-// ═══════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════
-function ts() { return new Date().toTimeString().slice(0,8); }
-function dateStr() { return new Date().toISOString().slice(0,10); }
+    // ═══════════════════════════════════════════════
+    //  UTILS
+    // ═══════════════════════════════════════════════
+    function ts() { return new Date().toTimeString().slice(0, 8); }
 
-function log(msg, type='in') {
-  const b = document.getElementById('logBody');
-  const d = document.createElement('div');
-  d.className = 'log-row';
-  d.innerHTML = `<span class="lt">${ts()}</span><span class="l${type}">${msg}</span>`;
-  b.prepend(d);
-  if (b.children.length > 120) b.lastChild.remove();
-}
+    function log(msg, type = 'in') {
+      const b = document.getElementById('logBody');
+      const d = document.createElement('div');
+      d.className = 'log-row';
+      d.innerHTML = `<span class="lt">${ts()}</span><span class="l${type}">${msg}</span>`;
+      b.prepend(d);
+      if (b.children.length > 120) b.lastChild.remove();
+    }
 
-function setStatus(cls, msg) {
-  const bar = document.getElementById('statusBar');
-  bar.className = 'statusbar ' + cls;
-  const dot = document.getElementById('sdot');
-  dot.className = 'sdot' + (cls==='s-watching'||cls==='s-scanning' ? ' blink' : '');
-  document.getElementById('statusTxt').textContent = msg;
-}
+    function setStatus(cls, msg) {
+      const bar = document.getElementById('statusBar');
+      bar.className = 'status-pill ' + cls;
+      document.getElementById('sdot').className = 'sdot' + (cls === 'sp-cam' || cls === 'sp-scanning' ? ' blink' : '');
+      document.getElementById('statusTxt').textContent = msg;
+    }
 
-function toast(msg, dur=2200) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.style.display='none', dur);
-}
+    function toast(msg, dur = 2400) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.style.display = 'none', dur);
+    }
 
-function setAiChip(txt) { document.getElementById('aiChip').textContent = txt; }
+    function setAiChip(txt) {
+      const c = document.getElementById('aiChip');
+      c.textContent = txt; c.style.display = 'block';
+    }
 
-function updateMetrics() {
-  document.getElementById('mTotal').textContent = totalParts;
-  document.getElementById('mOK').textContent    = okParts;
-  document.getElementById('mNG').textContent    = ngParts;
-  const pass = totalParts > 0 ? Math.round(okParts/totalParts*100) : null;
-  const pe = document.getElementById('mPass');
-  pe.textContent = pass !== null ? pass+'%' : '—';
-  pe.className = 'mc-val' + (pass===null?'': pass>=99?' g': pass>=95?'': ' r');
-}
+    function updateMetrics() {
+      document.getElementById('mTotal').textContent = totalParts;
+      document.getElementById('mOK').textContent = okParts;
+      document.getElementById('mNG').textContent = ngParts;
+      const pass = totalParts > 0 ? Math.round(okParts / totalParts * 100) : null;
+      const pe = document.getElementById('mPass');
+      pe.textContent = pass !== null ? pass + '%' : '—';
+      pe.className = 'mc-val' + (pass === null ? '' : pass >= 99 ? ' g' : pass >= 95 ? '' : ' r');
+    }
 
-// ═══════════════════════════════════════════════
-//  SLEEVE ICONS
-// ═══════════════════════════════════════════════
-function renderSleeveIcons(found, required) {
-  const c = document.getElementById('sleeveIcons');
-  c.innerHTML = '';
-  for (let i = 1; i <= required; i++) {
-    const div = document.createElement('div');
-    div.className = 'sleeve-dot' + (found >= i ? ' found' : (found !== null && found < i ? ' missing' : ''));
-    div.innerHTML = found >= i ? '<span class="tick">✓</span>' : `<span class="num">${i}</span>`;
-    c.appendChild(div);
-  }
-  document.getElementById('sleeveCount').textContent = found !== null ? found : '—';
-  document.getElementById('reqNum').textContent = required;
-}
+    // ═══════════════════════════════════════════════
+    //  SLEEVE ICONS
+    // ═══════════════════════════════════════════════
+    function renderSleeveIcons(found, required) {
+      const c = document.getElementById('sleeveIcons');
+      c.innerHTML = '';
+      for (let i = 1; i <= required; i++) {
+        const div = document.createElement('div');
+        const isFnd = found !== null && found >= i;
+        const isMiss = found !== null && found < i;
+        div.className = 'sleeve-dot' + (isFnd ? ' found' : (isMiss ? ' missing' : ''));
+        div.innerHTML = isFnd ? '<span class="tick">✓</span>' : `<span class="num">${i}</span>`;
+        c.appendChild(div);
+      }
+      document.getElementById('sleeveCount').textContent = found !== null ? found : '—';
+      document.getElementById('reqNum').textContent = required;
+    }
 
-// ═══════════════════════════════════════════════
-//  AUDIO
-// ═══════════════════════════════════════════════
-function initAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-}
+    // ═══════════════════════════════════════════════
+    //  AUDIO
+    // ═══════════════════════════════════════════════
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function makeTone(freq, startT, dur, type = 'square', vol = 1.0) {
+      if (!audioCtx || freq <= 0) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const comp = audioCtx.createDynamicsCompressor();
+      comp.threshold.value = -6; comp.ratio.value = 20; comp.attack.value = .001; comp.release.value = .05;
+      osc.connect(gain); gain.connect(comp); comp.connect(audioCtx.destination);
+      osc.type = type; osc.frequency.setValueAtTime(freq, startT);
+      gain.gain.setValueAtTime(0.001, startT);
+      gain.gain.linearRampToValueAtTime(vol * buzzVol, startT + .015);
+      gain.gain.setValueAtTime(vol * buzzVol, startT + dur - .03);
+      gain.gain.linearRampToValueAtTime(0.001, startT + dur);
+      osc.start(startT); osc.stop(startT + dur + .05);
+    }
+    function startEmergencyAlarm() { stopAlarm(); playAlarmCycle(); alarmInterval = setInterval(playAlarmCycle, 1800); }
+    function playAlarmCycle() {
+      initAudio();
+      if (navigator.vibrate) navigator.vibrate([400, 120, 400, 120, 600]);
+      const t = audioCtx.currentTime;
+      const steps = [[800, .15], [1000, .15], [1200, .15], [1400, .15], [1600, .2], [0, .1], [1600, .12], [1400, .12], [1200, .12], [1000, .12], [800, .12]];
+      let cur = 0;
+      steps.forEach(([f, d]) => {
+        if (f > 0) { makeTone(f, t + cur, d, 'square', .9); makeTone(f / 2, t + cur, d, 'sawtooth', .55); }
+        cur += d;
+      });
+    }
+    function stopAlarm() { clearInterval(alarmInterval); alarmInterval = null; }
+    function buzzOK() {
+      initAudio();
+      if (navigator.vibrate) navigator.vibrate(80);
+      const t = audioCtx.currentTime;
+      makeTone(880, t, .08, 'sine', .4); makeTone(1100, t + .1, .12, 'sine', .4);
+    }
+    function testAlarm() { initAudio(); startEmergencyAlarm(); setTimeout(stopAlarm, 4000); toast('🚨 Alarm test — 4 sec'); }
 
-function makeTone(freq, startT, dur, type='square', vol=1.0) {
-  if (!audioCtx || freq <= 0) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const comp = audioCtx.createDynamicsCompressor();
-  comp.threshold.value = -6; comp.ratio.value = 20;
-  comp.attack.value = 0.001; comp.release.value = 0.05;
-  osc.connect(gain); gain.connect(comp); comp.connect(audioCtx.destination);
-  osc.type = type; osc.frequency.setValueAtTime(freq, startT);
-  gain.gain.setValueAtTime(0.001, startT);
-  gain.gain.linearRampToValueAtTime(vol * buzzVol, startT + 0.015);
-  gain.gain.setValueAtTime(vol * buzzVol, startT + dur - 0.03);
-  gain.gain.linearRampToValueAtTime(0.001, startT + dur);
-  osc.start(startT); osc.stop(startT + dur + 0.05);
-}
+    // ═══════════════════════════════════════════════
+    //  CAMERA ── starts camera silently, no error if denied
+    // ═══════════════════════════════════════════════
+    async function initCamera() {
+      try {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        const vid = document.getElementById('video');
+        vid.srcObject = stream;
+        document.getElementById('camPlaceholder').style.display = 'none';
+        setAiChip('Camera active — ready to inspect');
+        document.getElementById('permBanner').classList.remove('show');
+        cameraReady = true;
+        log('Camera started', 'in');
+        renderSleeveIcons(null, reqSleeves);
+        return true;
+      } catch (e) {
+        cameraReady = false;
+        document.getElementById('permBanner').classList.add('show');
+        document.getElementById('camPlaceholder').querySelector('.tap-label').textContent = 'Camera access denied';
+        document.getElementById('camPlaceholder').querySelector('.tap-hint').textContent = 'Allow camera in browser settings, then tap here';
+        log('Camera error: ' + e.message, 'ng');
+        toast('⚠️ Camera: ' + e.message, 4000);
+        return false;
+      }
+    }
 
-function startEmergencyAlarm() {
-  stopAlarm();
-  playAlarmCycle();
-  alarmInterval = setInterval(playAlarmCycle, 1800);
-}
+    function captureFrame(quality = 0.82) {
+      const v = document.getElementById('video');
+      const c = document.createElement('canvas');
+      c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+      c.getContext('2d').drawImage(v, 0, 0);
+      return c.toDataURL('image/jpeg', quality).split(',')[1];
+    }
 
-function playAlarmCycle() {
-  initAudio();
-  if (navigator.vibrate) navigator.vibrate([400,120,400,120,600]);
-  const t = audioCtx.currentTime;
-  const steps = [[800,.15],[1000,.15],[1200,.15],[1400,.15],[1600,.2],[0,.1],[1600,.12],[1400,.12],[1200,.12],[1000,.12],[800,.12]];
-  let cur = 0;
-  steps.forEach(([f,d]) => {
-    if (f > 0) { makeTone(f,t+cur,d,'square',.9); makeTone(f/2,t+cur,d,'sawtooth',.55); }
-    cur += d;
-  });
-}
+    // ═══════════════════════════════════════════════
+    //  MAIN WATCH BUTTON — handles all states
+    // ═══════════════════════════════════════════════
+    async function handleWatchBtn() {
+      initAudio();
+      if (watching) {
+        // Stop watching
+        stopWatching();
+        return;
+      }
+      // If camera not ready, start it first
+      if (!cameraReady) {
+        setStatus('sp-cam', 'Starting camera…');
+        document.getElementById('watchLabel').textContent = 'STARTING CAMERA…';
+        document.getElementById('watchIcon').textContent = '📷';
+        const ok = await initCamera();
+        if (!ok) {
+          setStatus('sp-idle', 'Camera not available — check permissions');
+          document.getElementById('watchLabel').textContent = 'START WATCHING';
+          document.getElementById('watchIcon').textContent = '👁';
+          return;
+        }
+        // Small delay so camera warms up
+        await new Promise(r => setTimeout(r, 800));
+      }
+      if (!apiKey) {
+        toast('⚠️ No API key — tap ⚙️ to set it first', 3500);
+        openSettings();
+        return;
+      }
+      startWatching();
+    }
 
-function stopAlarm() { clearInterval(alarmInterval); alarmInterval = null; }
+    function startWatching() {
+      watching = true;
+      const btn = document.getElementById('btnWatch');
+      btn.className = 'btn-watch watching';
+      btn.classList.remove('btn-pulse');
+      document.getElementById('watchLabel').textContent = 'STOP WATCHING';
+      document.getElementById('watchIcon').textContent = '⏹';
+      document.getElementById('scanLine').style.display = 'block';
+      partWasPresent = false; maxSleevesSeenThisCycle = 0;
+      setStatus('sp-cam', 'AI watching for part…');
+      log('Watching started', 'in');
+      runScan();
+      const ms = parseInt(document.getElementById('intSlider').value) * 1000;
+      watchTimer = setInterval(runScan, ms);
+    }
 
-function buzzOK() {
-  initAudio();
-  if (navigator.vibrate) navigator.vibrate(80);
-  const t = audioCtx.currentTime;
-  makeTone(880,t,.08,'sine',.4); makeTone(1100,t+.1,.12,'sine',.4);
-}
+    function stopWatching() {
+      watching = false;
+      clearInterval(watchTimer);
+      const btn = document.getElementById('btnWatch');
+      btn.className = 'btn-watch idle btn-pulse';
+      document.getElementById('watchLabel').textContent = 'START WATCHING';
+      document.getElementById('watchIcon').textContent = '👁';
+      document.getElementById('scanLine').style.display = 'none';
+      stopAlarm(); hideOverlays();
+      setStatus('sp-idle', 'Watching stopped — tap to resume');
+      log('Watching stopped', 'in');
+    }
 
-function testAlarm() {
-  initAudio(); startEmergencyAlarm();
-  setTimeout(stopAlarm, 4000);
-  toast('🚨 Alarm test — 4 sec');
-}
-
-// ═══════════════════════════════════════════════
-//  CAMERA
-// ═══════════════════════════════════════════════
-async function startCam() {
-  try {
-    if (stream) stream.getTracks().forEach(t=>t.stop());
-    stream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
-    });
-    document.getElementById('video').srcObject = stream;
-    document.getElementById('btnCam').textContent = '🔄 Restart Cam';
-    document.getElementById('btnWatch').disabled = false;
-    document.getElementById('btnBuzz').disabled  = false;
-    setStatus('s-idle','Camera ready — press START WATCHING');
-    setAiChip('Camera active');
-    log('Camera started','in');
-    renderSleeveIcons(null, reqSleeves);
-  } catch(e) {
-    setStatus('s-idle','Camera error: '+e.message);
-    toast('Camera error: '+e.message, 3500);
-    log('Camera error: '+e.message,'ng');
-  }
-}
-
-function captureFrame(quality=0.82) {
-  const v = document.getElementById('video');
-  const c = document.createElement('canvas');
-  c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
-  c.getContext('2d').drawImage(v,0,0);
-  return c.toDataURL('image/jpeg',quality).split(',')[1];
-}
-
-// ═══════════════════════════════════════════════
-//  GEMINI API — called directly from browser
-// ═══════════════════════════════════════════════
-async function callGemini(b64Image, required=3) {
-  if (!apiKey) return {error:'No API key set'};
-
-  const prompt = `You are a quality control vision AI on an assembly line.
-
+    // ═══════════════════════════════════════════════
+    //  GEMINI API
+    // ═══════════════════════════════════════════════
+    async function callGemini(b64Image, required = 3) {
+      if (!apiKey) return { error: 'No API key set' };
+      const prompt = `You are a quality control vision AI on an assembly line.
 Inspect the image of an RBC (Radiator Blower Cooling) Fan Shroud assembly.
-
-Your tasks:
-1. Is a shroud part currently visible/present in the frame? (yes/no)
-2. Count the metal rubber mounting SLEEVES visible on the shroud.
-   Sleeves are small cylindrical metal/rubber grommets at the 4 attachment points.
-3. Is the frame empty (part removed/no part)?
-
+Tasks:
+1. Is a shroud part currently visible/present? (yes/no)
+2. Count the metal rubber mounting SLEEVES on the shroud (cylindrical metal/rubber grommets at attachment points).
+3. Is the frame empty (no part)?
 Required sleeve count to pass: ${required}
-
 Reply ONLY with valid JSON, nothing else:
-{
-  "part_present": true or false,
-  "sleeve_count": <integer 0-4>,
-  "frame_empty": true or false,
-  "confidence": "high" or "medium" or "low",
-  "notes": "<one short sentence about what you see, max 12 words>"
-}`;
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
-  const body = JSON.stringify({
-    contents:[{parts:[
-      {text:prompt},
-      {inline_data:{mime_type:'image/jpeg',data:b64Image}}
-    ]}],
-    generationConfig:{temperature:0.1,maxOutputTokens:200}
-  });
-
-  try {
-    const resp = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body});
-    if (!resp.ok) {
-      const err = await resp.text();
-      return {error:`HTTP ${resp.status}: ${err.slice(0,120)}`};
+{"part_present":true or false,"sleeve_count":<integer 0-4>,"frame_empty":true or false,"confidence":"high" or "medium" or "low","notes":"<one short sentence, max 12 words>"}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+      const body = JSON.stringify({
+        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: b64Image } }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
+      });
+      try {
+        const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+        if (!resp.ok) { const err = await resp.text(); return { error: `HTTP ${resp.status}: ${err.slice(0, 120)}` }; }
+        const data = await resp.json();
+        let text = data.candidates[0].content.parts[0].text.trim();
+        text = text.replace(/```json|```/g, '').trim();
+        return JSON.parse(text);
+      } catch (e) { return { error: e.message.slice(0, 120) }; }
     }
-    const data = await resp.json();
-    let text = data.candidates[0].content.parts[0].text.trim();
-    text = text.replace(/```json|```/g,'').trim();
-    return JSON.parse(text);
-  } catch(e) {
-    return {error:e.message.slice(0,120)};
-  }
-}
 
-// ═══════════════════════════════════════════════
-//  WATCH CYCLE
-// ═══════════════════════════════════════════════
-function toggleWatch() {
-  watching = !watching;
-  const btn = document.getElementById('btnWatch');
-  const sl  = document.getElementById('scanLine');
-  if (watching) {
-    initAudio();
-    btn.textContent = '⏹ STOP WATCHING'; btn.className = 'btn btn-watch active';
-    sl.style.display = 'block';
-    partWasPresent = false; maxSleevesSeenThisCycle = 0;
-    setStatus('s-watching','AI watching for part…');
-    log('Watching started','in');
-    runScan();
-    const ms = parseInt(document.getElementById('intSlider').value)*1000;
-    watchTimer = setInterval(runScan, ms);
-  } else {
-    clearInterval(watchTimer);
-    btn.textContent = '👁 START WATCHING'; btn.className = 'btn btn-watch';
-    sl.style.display = 'none';
-    stopAlarm(); hideOverlays();
-    setStatus('s-idle','Watching stopped');
-    log('Watching stopped','in');
-  }
-}
+    // ═══════════════════════════════════════════════
+    //  SCAN CYCLE
+    // ═══════════════════════════════════════════════
+    async function runScan() {
+      if (!stream || !watching) return;
+      setStatus('sp-scanning', '🤖 AI analyzing frame…');
+      let b64;
+      try { b64 = captureFrame(); } catch (e) { return; }
+      const result = await callGemini(b64, reqSleeves);
+      if (!watching) return; // stopped during async
+      if (result.error) {
+        setAiChip('⚠️ ' + result.error.slice(0, 45));
+        setStatus('sp-cam', 'AI error — check API key');
+        log('AI error: ' + result.error.slice(0, 55), 'warn');
+        document.getElementById('aiFeed').textContent = '⚠️ ' + result.error;
+        return;
+      }
+      const partPresent = result.part_present === true;
+      const frameEmpty = result.frame_empty === true;
+      const sleeves = parseInt(result.sleeve_count) || 0;
+      const confidence = result.confidence || 'medium';
+      const notes = result.notes || '';
+      lastNotes = notes;
+      document.getElementById('aiFeed').textContent =
+        `Part: ${partPresent ? '✅ Present' : '❌ Absent'} · Sleeves: ${sleeves} · Conf: ${confidence}\n"${notes}"`;
+      document.getElementById('presenceBar').className = 'presence-bar' + (partPresent ? ' present' : '');
+      if (partPresent) {
+        setStatus('sp-cam', `Part present · ${sleeves}/${reqSleeves} sleeves visible`);
+        setAiChip(`✅ Part in view · ${sleeves}/${reqSleeves} sleeves`);
+        if (!partWasPresent) { maxSleevesSeenThisCycle = 0; log('New part detected', 'in'); }
+        partWasPresent = true;
+        if (sleeves > maxSleevesSeenThisCycle) maxSleevesSeenThisCycle = sleeves;
+        renderSleeveIcons(sleeves, reqSleeves);
+      } else if (frameEmpty && partWasPresent) {
+        partWasPresent = false;
+        renderFinalVerdict(maxSleevesSeenThisCycle);
+        maxSleevesSeenThisCycle = 0;
+      } else if (!partPresent && !partWasPresent) {
+        setStatus('sp-cam', 'Waiting for part to be placed…');
+        setAiChip('Waiting for part…');
+        renderSleeveIcons(null, reqSleeves);
+        document.getElementById('sleeveCount').textContent = '—';
+      }
+    }
 
-async function runScan() {
-  if (!stream) return;
-  setStatus('s-scanning','🤖 AI analyzing frame…');
-  let b64;
-  try { b64 = captureFrame(); } catch(e) { return; }
+    // ═══════════════════════════════════════════════
+    //  VERDICT
+    // ═══════════════════════════════════════════════
+    function renderFinalVerdict(sleevesFound) {
+      const isOK = sleevesFound >= reqSleeves;
+      totalParts++; if (isOK) okParts++; else ngParts++;
+      updateMetrics();
+      renderSleeveIcons(sleevesFound, reqSleeves);
+      const now = new Date();
+      inspectionLog.push({
+        part: totalParts, date: now.toISOString().slice(0, 10), time: now.toTimeString().slice(0, 8),
+        shift: document.getElementById('shiftSel').value,
+        operator: document.getElementById('opInput').value || 'Operator',
+        sleeves_found: sleevesFound, required: reqSleeves,
+        result: isOK ? 'OK' : 'NG', notes: lastNotes
+      });
+      if (isOK) {
+        document.getElementById('resOKSub').textContent = `${sleevesFound} / ${reqSleeves} sleeves ✓`;
+        showOverlay('ok'); buzzOK();
+        setStatus('sp-ok', `✅ PART OK — ${sleevesFound}/${reqSleeves} sleeves`);
+        log(`PART OK — ${sleevesFound}/${reqSleeves} sleeves`, 'ok');
+        setTimeout(hideOverlays, 3500);
+      } else {
+        document.getElementById('resNGSub').textContent = `Only ${sleevesFound} of ${reqSleeves} found!`;
+        showOverlay('ng'); startEmergencyAlarm();
+        setStatus('sp-ng', `🚨 SLEEVE MISSING — ${sleevesFound}/${reqSleeves}`);
+        log(`SLEEVE MISSING — ${sleevesFound}/${reqSleeves} · ${lastNotes}`, 'ng');
+        setTimeout(() => { stopAlarm(); hideOverlays(); if (watching) setStatus('sp-cam', 'Watching for next part…'); }, 6000);
+      }
+    }
+    function showOverlay(type) {
+      document.getElementById('resOK').className = 'result-overlay res-ok-bg' + (type === 'ok' ? ' show' : '');
+      document.getElementById('resNG').className = 'result-overlay res-ng-bg' + (type === 'ng' ? ' show' : '');
+    }
+    function hideOverlays() {
+      document.getElementById('resOK').className = 'result-overlay res-ok-bg';
+      document.getElementById('resNG').className = 'result-overlay res-ng-bg';
+    }
 
-  const result = await callGemini(b64, reqSleeves);
+    // ═══════════════════════════════════════════════
+    //  CSV EXPORT
+    // ═══════════════════════════════════════════════
+    function exportCSV() {
+      if (inspectionLog.length === 0) { toast('No inspection data yet'); return; }
+      const headers = ['Part #', 'Date', 'Time', 'Shift', 'Operator', 'Sleeves Found', 'Required', 'Result', 'AI Notes'];
+      const rows = inspectionLog.map(r => [r.part, r.date, r.time, r.shift, r.operator, r.sleeves_found, r.required, r.result, `"${r.notes.replace(/"/g, '""')}"`].join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = `sleeve_log_${new Date().toISOString().slice(0, 16).replace(':', '-')}.csv`;
+      a.click();
+      toast(`📥 Exported ${inspectionLog.length} records`);
+    }
 
-  if (result.error) {
-    setAiChip('Error: '+result.error.slice(0,45));
-    setStatus('s-watching','AI error — check API key');
-    log('AI error: '+result.error.slice(0,55),'warn');
-    document.getElementById('aiFeed').textContent = '⚠️ '+result.error;
-    return;
-  }
+    // ═══════════════════════════════════════════════
+    //  SETTINGS MODAL
+    // ═══════════════════════════════════════════════
+    function openSettings() {
+      document.getElementById('modalBg').className = 'modal-bg show';
+      const statusEl = document.getElementById('apiKeyStatus');
+      if (apiKey) { statusEl.textContent = '✅ Key saved: ' + apiKey.slice(0, 6) + '…'; statusEl.className = 'api-status api-ok'; }
+      else { statusEl.textContent = 'No key saved'; statusEl.className = 'api-status api-none'; }
+      updateChips(currentModel);
+    }
+    function closeModal() { document.getElementById('modalBg').className = 'modal-bg'; }
+    function closeModalOnBg(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
+    function pickModel(m) { currentModel = m; updateChips(m); }
+    function updateChips(m) {
+      document.querySelectorAll('.chip').forEach(c => {
+        const label = c.textContent;
+        c.classList.toggle('active',
+          (m === 'gemini-2.0-flash' && label.includes('2.0')) ||
+          (m === 'gemini-1.5-flash' && label.includes('1.5 Flash')) ||
+          (m === 'gemini-1.5-pro' && label.includes('Pro'))
+        );
+      });
+    }
+    async function saveSettings() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (!key) { toast('Paste your API key first'); return; }
+      apiKey = key; saveStorage();
+      const statusEl = document.getElementById('apiKeyStatus');
+      statusEl.textContent = '✅ Saved — key stored in browser';
+      statusEl.className = 'api-status api-ok';
+      document.getElementById('apiStatus').textContent = 'Model: ' + currentModel + ' · Key ✓';
+      document.getElementById('settingsBtn').style.background = 'rgba(34,197,94,.1)';
+      document.getElementById('settingsBtn').style.borderColor = 'rgba(34,197,94,.3)';
+      toast('✅ Settings saved!');
+      setTimeout(closeModal, 900);
+    }
 
-  const partPresent = result.part_present === true;
-  const frameEmpty  = result.frame_empty  === true;
-  const sleeves     = parseInt(result.sleeve_count) || 0;
-  const confidence  = result.confidence || 'medium';
-  const notes       = result.notes || '';
-  lastNotes = notes;
+    // ═══════════════════════════════════════════════
+    //  SLIDERS & RESET
+    // ═══════════════════════════════════════════════
+    function onReq(el) {
+      reqSleeves = parseInt(el.value);
+      document.getElementById('reqVal').textContent = reqSleeves;
+      renderSleeveIcons(null, reqSleeves);
+    }
+    function onInt(el) {
+      document.getElementById('intVal').textContent = el.value + 's';
+      if (watching) { clearInterval(watchTimer); watchTimer = setInterval(runScan, parseInt(el.value) * 1000); }
+    }
+    function onVol(el) {
+      buzzVol = parseFloat(el.value);
+      document.getElementById('volVal').textContent = buzzVol >= 1.0 ? 'MAX' : Math.round(buzzVol * 100) + '%';
+    }
+    function resetSession() {
+      if (watching) stopWatching();
+      totalParts = 0; okParts = 0; ngParts = 0;
+      updateMetrics(); renderSleeveIcons(null, reqSleeves); hideOverlays();
+      document.getElementById('sleeveCount').textContent = '—';
+      document.getElementById('aiFeed').textContent = 'AI analysis will appear here when watching…';
+      document.getElementById('logBody').innerHTML = '';
+      toast('Session reset'); log('Session reset', 'in');
+    }
 
-  document.getElementById('aiFeed').textContent =
-    `Part: ${partPresent?'✅ Present':'❌ Absent'} · Sleeves: ${sleeves} · Conf: ${confidence}\n"${notes}"`;
-
-  document.getElementById('presenceBar').className = 'presence-bar'+(partPresent?' present':'');
-
-  if (partPresent) {
-    setStatus('s-watching',`Part present · ${sleeves}/${reqSleeves} sleeves visible`);
-    setAiChip(`✅ Part in view · ${sleeves}/${reqSleeves} sleeves`);
-    if (!partWasPresent) { maxSleevesSeenThisCycle = 0; log('New part detected','in'); }
-    partWasPresent = true;
-    if (sleeves > maxSleevesSeenThisCycle) maxSleevesSeenThisCycle = sleeves;
-    renderSleeveIcons(sleeves, reqSleeves);
-  } else if (frameEmpty && partWasPresent) {
-    partWasPresent = false;
-    renderFinalVerdict(maxSleevesSeenThisCycle);
-    maxSleevesSeenThisCycle = 0;
-  } else if (!partPresent && !partWasPresent) {
-    setStatus('s-watching','Waiting for part to be placed…');
-    setAiChip('Waiting for part…');
+    // ═══════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════
+    loadStorage();
     renderSleeveIcons(null, reqSleeves);
-    document.getElementById('sleeveCount').textContent = '—';
-  }
-}
-
-// ═══════════════════════════════════════════════
-//  FINAL VERDICT
-// ═══════════════════════════════════════════════
-function renderFinalVerdict(sleevesFound) {
-  const isOK = sleevesFound >= reqSleeves;
-  totalParts++;
-  if (isOK) okParts++; else ngParts++;
-  updateMetrics();
-  renderSleeveIcons(sleevesFound, reqSleeves);
-
-  const now = new Date();
-  inspectionLog.push({
-    part: totalParts,
-    date: now.toISOString().slice(0,10),
-    time: now.toTimeString().slice(0,8),
-    shift: document.getElementById('shiftSel').value,
-    operator: document.getElementById('opInput').value || 'Operator',
-    sleeves_found: sleevesFound,
-    required: reqSleeves,
-    result: isOK ? 'OK' : 'NG',
-    notes: lastNotes
-  });
-
-  if (isOK) {
-    document.getElementById('resOKSub').textContent = `${sleevesFound} / ${reqSleeves} sleeves ✓`;
-    showOverlay('ok'); buzzOK();
-    setStatus('s-ok',`✅ PART OK — ${sleevesFound}/${reqSleeves} sleeves`);
-    log(`PART OK — ${sleevesFound}/${reqSleeves} sleeves`,'ok');
-    setTimeout(hideOverlays, 3500);
-  } else {
-    document.getElementById('resNGSub').textContent = `Only ${sleevesFound} of ${reqSleeves} found!`;
-    showOverlay('ng'); startEmergencyAlarm();
-    setStatus('s-ng',`🚨 SLEEVE MISSING — ${sleevesFound}/${reqSleeves}`);
-    log(`SLEEVE MISSING — ${sleevesFound}/${reqSleeves} · ${lastNotes}`,'ng');
-    setTimeout(() => { stopAlarm(); hideOverlays(); if (watching) setStatus('s-watching','Watching for next part…'); }, 6000);
-  }
-}
-
-function showOverlay(type) {
-  document.getElementById('resOK').className = 'result-overlay res-ok-bg'+(type==='ok'?' show':'');
-  document.getElementById('resNG').className = 'result-overlay res-ng-bg'+(type==='ng'?' show':'');
-}
-function hideOverlays() {
-  document.getElementById('resOK').className = 'result-overlay res-ok-bg';
-  document.getElementById('resNG').className = 'result-overlay res-ng-bg';
-}
-
-// ═══════════════════════════════════════════════
-//  CSV EXPORT (replaces Flask /download)
-// ═══════════════════════════════════════════════
-function exportCSV() {
-  if (inspectionLog.length === 0) { toast('No inspection data yet'); return; }
-  const headers = ['Part #','Date','Time','Shift','Operator','Sleeves Found','Required','Result','AI Notes'];
-  const rows = inspectionLog.map(r =>
-    [r.part,r.date,r.time,r.shift,r.operator,r.sleeves_found,r.required,r.result,`"${r.notes.replace(/"/g,'""')}"`].join(',')
-  );
-  const csv = [headers.join(','), ...rows].join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `sleeve_log_${new Date().toISOString().slice(0,16).replace(':','-')}.csv`;
-  a.click();
-  toast(`📥 Exported ${inspectionLog.length} records`);
-}
-
-// ═══════════════════════════════════════════════
-//  SETTINGS MODAL
-// ═══════════════════════════════════════════════
-function openSettings() {
-  document.getElementById('modalBg').className = 'modal-bg show';
-  const statusEl = document.getElementById('apiKeyStatus');
-  if (apiKey) {
-    statusEl.textContent = '✅ Key saved: '+apiKey.slice(0,6)+'…';
-    statusEl.className   = 'api-status api-ok';
-  } else {
-    statusEl.textContent = 'No key saved'; statusEl.className = 'api-status api-none';
-  }
-  updateChips(currentModel);
-}
-function closeModal() { document.getElementById('modalBg').className = 'modal-bg'; }
-function closeModalOnBg(e) { if (e.target===document.getElementById('modalBg')) closeModal(); }
-function pickModel(m) { currentModel = m; updateChips(m); }
-function updateChips(m) {
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.textContent.includes(m.replace('gemini-','')));
-  });
-}
-
-async function saveSettings() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) { toast('Paste your API key first'); return; }
-  apiKey = key; saveStorage();
-  const statusEl = document.getElementById('apiKeyStatus');
-  statusEl.textContent = '✅ Saved — key stored in browser';
-  statusEl.className   = 'api-status api-ok';
-  document.getElementById('apiStatus').textContent = 'Model: '+currentModel+' · Key set ✓';
-  toast('✅ Settings saved!');
-  setTimeout(closeModal, 1000);
-}
-
-// ═══════════════════════════════════════════════
-//  SLIDERS
-// ═══════════════════════════════════════════════
-function onReq(el) {
-  reqSleeves = parseInt(el.value);
-  document.getElementById('reqVal').textContent = reqSleeves;
-  renderSleeveIcons(null, reqSleeves);
-}
-function onInt(el) {
-  document.getElementById('intVal').textContent = el.value+'s';
-  if (watching) { clearInterval(watchTimer); watchTimer = setInterval(runScan, parseInt(el.value)*1000); }
-}
-function onVol(el) {
-  buzzVol = parseFloat(el.value);
-  document.getElementById('volVal').textContent = buzzVol >= 1.0 ? 'MAX' : Math.round(buzzVol*100)+'%';
-}
-
-// ═══════════════════════════════════════════════
-//  RESET / CLEAR
-// ═══════════════════════════════════════════════
-function resetLog() {
-  inspectionLog.length = 0;
-  document.getElementById('logBody').innerHTML = '';
-  toast('Log cleared'); log('Inspection log cleared','in');
-}
-
-function resetSession() {
-  if (watching) toggleWatch();
-  totalParts=0; okParts=0; ngParts=0;
-  updateMetrics();
-  partWasPresent=false; maxSleevesSeenThisCycle=0;
-  renderSleeveIcons(null,reqSleeves);
-  hideOverlays();
-  document.getElementById('sleeveCount').textContent='—';
-  toast('Session reset'); log('Session reset','in');
-}
-
-// ═══════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════
-loadStorage();
-renderSleeveIcons(null, reqSleeves);
-log('Gemini AI Sleeve Inspector ready','in');
-log('Set API key (⚙️) → Start Camera → WATCH','in');
-</script>
+    log('Gemini AI Sleeve Inspector ready', 'in');
+    log('Tap START WATCHING to begin', 'in');
+  </script>
 </body>
+
 </html>
